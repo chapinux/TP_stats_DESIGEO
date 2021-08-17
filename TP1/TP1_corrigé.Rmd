@@ -1,0 +1,346 @@
+---
+title: "Premières manipulations avec R: Corrigé"
+author: "PC"
+date: "2021"
+output: 
+   html_document :
+     theme: paper
+     toc_float: 
+        collapsed: true
+     toc: yes
+     highlight: tango
+     number_sections: yes
+     number_subsections: yes
+self-contained : yes
+---
+
+
+
+
+
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(class.source = "bg.success")
+library(rmarkdown)
+library(dplyr)
+setwd("/home/paulchapron/coursDESIGEO/TP_stats_DESIGEO/TP1/")
+```
+
+
+```{css, echo=FALSE}
+.code_guide {
+  background-color: #FF0000;
+}
+```
+
+
+
+# Exercice \#1   
+
+1. Créer une liste de 3 éléments 
+2. Changer la valeur du deuxième élément de votre objet
+3. Affecter à la liste  les trois noms suivants : "A" , "B" et "C"
+4. Ajouter un élément à votre liste 
+5. Nommer cet élément ajouté
+6. Supprimer le troisième élément de cette liste
+7. Afficher la liste finale et sa longueur
+
+
+```{r exo1_corr}
+#1
+my_list <-  c("riri","fifi","loulou")
+#2
+my_list[2] <- "zaza"
+#3
+names(my_list) <-  c("A", "B", "C")
+#4
+my_list <- c(my_list, "donald")
+#5
+names(my_list)[4] <- "D"
+#6
+my_list <- my_list[-3]
+#7
+my_list # ou cat(my_list)
+length(my_list)
+```
+
+
+
+
+
+# Exercice #2
+
+
+0. Installer et  charger le jeu de données du package `palmerpenguins`
+
+```{r exo2setup, eval=FALSE}
+install.packages("palmerpenguins")
+library(palmerpenguins )
+```
+
+Le jeu de données de ce package se nomme `penguins` 
+
+
+1. Quelles sont les variables de ce jeu de données ? 
+```{r exo2_corrsetup, echo=FALSE}
+library(palmerpenguins)
+```
+
+```{r exo2_corr}
+names(penguins)
+```
+
+2. Quel est le poids moyens des pingouins  ? 
+```{r exo2_corr2}
+mean(penguins$body_mass_g, na.rm = T)
+```
+
+Il faut préciser l'argument  `na.rm` à `TRUE` sinon le calcul échoue à cause des valeurs non attribuées.
+
+3. Créer un dataframe qui ne contienne que les pingouins de l'espèce Gentoo 
+
+```{r exo2_corr3}
+gentoos <-  penguins[penguins$species =="Gentoo",]
+```
+Variante avec `dplyr`
+
+```{r exo2_corr3bis}
+gentoos <-  filter(penguins, species =="Gentoo")
+# variante avec l'opérateur %>% 
+gentoos <-  penguins %>% filter(species =="Gentoo")
+```
+
+4. Quelle est le poids moyen d'un pingouin Gentoo ? 
+
+```{r exo2_corr4}
+mean(gentoos$body_mass_g, na.rm = T)
+```
+
+5. Sur quelle(s) île(s) trouve-t-on  les pingouins de l'espèce Adélie?
+
+```{r exo2_corr5}
+penguinsAdelie <- penguins[penguins$species=="Adelie",]
+islandsAdelie <- unique(penguinsAdelie$island)
+islandsAdelie
+```
+
+6. Y-a-t' il des autres pingouins que des pingouins Adélie sur les îles déterminées à la question 5 ? 
+
+```{r exo2_corr6}
+penguins[penguins$island %in% islandsAdelie,]
+```
+Oui ! 
+
+
+
+
+
+# Exercice #3
+
+1. Écrire une fonction qui prend en argument un vecteur de valeurs numériques et qui le centre et le réduit , c'est-à-dire qui soustrait à chaque valeur la moyenne du vecteur et qui divise par la valeur de l'écart-type . Vous pouvez tester votre fonction avec un vecteur initialisé par vos soins, un dataframe de votre choix ou le dataframe `iris`.
+
+
+```{r exo3_corr}
+center_reduce <-  function(v){
+  m <-  mean(v)
+  s <-  sd(v)
+  result <-  (v - m) / s
+  return(result)
+}
+```
+
+Test de la fonction sur `iris$Sepal.Length`
+
+
+```{r exo3_corr2}
+center_reduce(iris$Sepal.Length)
+```
+
+
+
+
+2. Afficher l'histogramme du vecteur centré et réduit.
+
+```{r exo3_corr3}
+meanSepalLength <- center_reduce(iris$Sepal.Length)
+hist(meanSepalLength)
+```
+
+
+
+# Exercice #4 
+
+1. Récupérer les données 
+
+Récupérer le fichier `2020_LoL_esports_match_data_from_OraclesElixir_20210124.csv` sur le répertoire partagé de la formation.
+
+Il s'agit de résultats d'une compétition d'e-sport sur le  jeu  "Leagues of Legend", qui oppose deux équipes de 5 joueurs. La connaissance du jeu lui même n'est pas nécessaire pour répondre aux questions.^
+Une ligne contient les variables qui décrivent **un** match d'**un** joueur 
+
+Pour les questions suivantes, faites figurer dans un script R le code qui vous permet de réaliser les étapes suivantes :  
+
+2. Lire le fichier 
+
+```{r exo4_corr}
+loldata <- read.csv("./2020_LoL_esports_match_data_from_OraclesElixir_20210124.csv")
+```
+
+
+
+
+3. Identifier le nombre de colonnes et de lignes du fichier 
+
+```{r exo4_corr2}
+nrow(loldata)
+ncol(loldata)
+# affichage formatté
+cat(nrow(loldata), "lignes et ", ncol(loldata), "colonnes.")
+```
+
+
+4. Quel est le type de la colonne `position`  et de la colonne  `dpm`  du jeu de données ? 
+
+```{r exo4_corr3}
+class(loldata$position)
+class(loldata$dpm)
+```
+
+
+5. Calculer la valeur moyenne de la colonne `totalgold`
+
+
+```{r exo4_corr4}
+mean(loldata$totalgold)
+```
+
+6. A partir du jeu de données initial, on vous demande de créer un second dataframe qui ne contienne que les données des joueurs qui ont perdu les  matchs de la compétition . Dans les données , c'est la colonne `result` qui porte cette information, la valeur `0` signifiant une défaite.   
+
+
+```{r exo4_corr5}
+loosers <-  loldata %>%  filter(result==0)
+```
+
+
+
+7. Sauvegarder le résultat dans un fichier que vous appelez "defeats.csv"
+
+
+```{r exo4_corr6, eval=F}
+write.csv(loosers, "defeats.csv") 
+```
+
+
+8. Les données sur les matches contiennent une colonne `totalgold` (l'or gagné par les joueurs au courts d'un match) et une colonne `gamelength` qui indique la durée du match en secondes.  Créer une fonction qui calcule le nombre de d'unité de "gold" par minute à partir d'une durée en secondes et d'une quantité de `totalgold`. 
+
+```{r exo4_corr7}
+compute_gold_by_minute <-  function(gold, time){
+  minutes <-  time/60
+  return(gold/minutes)
+}
+```
+
+
+
+9. Ajouter une colonne intitulée `gold_per_min`au dataframe, qui contienne la quantité de  `gold` obtenue par minute, calculée sur toutes les données à l'aide de votre fonction.
+
+
+
+```{r exo4_corr8}
+loldata$gold_per_min <- compute_gold_by_minute(loldata$totalgold, loldata$gamelength) 
+```
+
+
+10. Appliquer (et éventuellement adapter) la fonction créée en 8. sur les données de matches avec les colonnes `kills` et `gamelength`, et ajouter une colonne qui s'intitule `kill_per_min`.
+
+Variante 1 : on réécrit la fonction
+
+```{r exo4_corr9}
+compute_kill_by_min <-  function(kills, time){
+  return(kills/ (time/60))
+}
+loldata$kill_per_min <- compute_kill_by_min(loldata$kills, loldata$gamelength)
+```
+
+
+
+Variante 2 : on applique la fonction `compute_gold_by_min` en remplaçant les arguments
+
+```{r exo4_corr9_2}
+loldata$kill_per_min <- compute_gold_by_minute(loldata$kills, loldata$gamelength)
+```
+
+
+Variante 3 : calcul direct 
+
+```{r exo4_corr9_3}
+loldata$kill_per_min <- loldata$kills / (loldata$gamelength/60)
+```
+
+
+
+
+11. Tracer le nuage de points qui représente les deux variables nouvellement crées : `gold_per_min`et `kill_per_min`
+
+```{r exo4_corr10, fig.height=4, fig.width=4}
+plot(x = loldata$gold_per_min, y=loldata$kill_per_min)
+```
+
+Variante avec ggplot
+```{r exo4_corr10_2, cache=T}
+library(ggplot2)
+myplot <- ggplot(loldata, aes(x=gold_per_min, y=kill_per_min))+
+                     geom_point(color="darkcyan", size=.1)
+myplot
+```
+
+12. Optionnel : Envoyer  le code (si vous voulez une correction spécifique)
+
+
+# Exercice #5
+Implémentez en R le [crible d'ératosthène](https://fr.wikipedia.org/wiki/Crible_d%27%C3%89ratosth%C3%A8ne)
+
+```{r}
+limite <-  200
+isprime <-  rep(TRUE, limite)
+isprime[1] <-  FALSE
+isprime[seq(from=4, to=limite, by=2)] <- FALSE
+
+i <-  3
+while (i*i < limite) {
+  if(isprime[i]){
+    for (j in seq(from=i*i, to=limite, by=2*i ) ) {
+      isprime[j] <-  FALSE
+    }
+  }
+  i <-  i+1
+}
+
+numbers <-  seq(from=1, to=200, by=1)
+prime_numbers <-numbers[isprime]  
+prime_numbers
+```
+
+Vous pouvez vous inspirer du pseudo code suivant :
+ ```{r,tidy=FALSE, eval=FALSE, highlight=FALSE  }
+ Fonction Eratosthène(Limite)
+    L = tableau de booléen de taille Limite, initialisé à Vrai
+    Mettre à Faux les cases d'indice pair > 2
+    L[1] = Faux
+    i=3
+    Tant que i*i≤Limite
+        Si L[i]
+            Pour j de i*i à Limite par pas de 2*i
+                L[j] = Faux
+            Fin pour
+        Fin si
+        i=i+1
+    Fin tant que
+    Retourner L
+Fin fonction
+```
+
+
+
+
+

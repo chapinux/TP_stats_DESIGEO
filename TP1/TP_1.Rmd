@@ -220,11 +220,11 @@ Notez l'emploi des doubles crochets pour accéder à un élément de la liste, �
 
 1. Créer une liste de 3 éléments 
 2. Changer la valeur du deuxième élément de votre objet
-3. Affecter à l'objet les trois noms suivants : "A" , "B" et "C"
-4. Ajouter un élément à votre objet 
+3. Affecter à la liste  les trois noms suivants : "A" , "B" et "C"
+4. Ajouter un élément à votre liste 
 5. Nommer cet élément ajouté
 6. Supprimer le troisième élément de cette liste
-7. Afficher l'objet final et sa longueur
+7. Afficher la liste finale et sa longueur
 
 
 # Matrices
@@ -725,8 +725,8 @@ Pour le lire on peut utiliser la fonction de base `read.csv()`. En cas de fichie
 
 
 
-Pour lire un fichier , il faut être capable d'exprimer son **chemin d'accès** (path en anaglais) dans le format adapté à votre système d'exploitation. 
-Reportez-vous à ce document [TODO Lien] pour des précisions.
+Pour lire un fichier , il faut être capable d'exprimer son **chemin d'accès** (path en anglais) dans le format adapté à votre système d'exploitation. 
+Reportez-vous à ce document [TODO trouver un lien] pour des précisions.
 
 
 
@@ -804,7 +804,7 @@ write.csv( iris, file = "/chemin/vers/repertoire/mon_fichier.csv")
 De nombreuses options sont possibles : vous pouvez préciser le type de séparateur utilisé, le caractère de fin de ligne,  l'écriture des noms de colonnes etc...
 
 
-# Exercice complet 
+# Exercice #4 
 
 1. Récupérer les données 
 
@@ -824,7 +824,7 @@ Pour les questions suivantes, faites figurer dans un script R le code qui vous p
 
 5. Calculer la valeur moyenne de la colonne `totalgold`
 
-6. A partir de ce jeu de données, on vous demande de créer un second dataframe qui ne contienne que les données des joueurs qui ont perdu les  matchs de la compétition . Dans les données , c'est la colonne `result` qui porte cette information, la valeur `0` signifiant une défaite.   
+6. A partir du jeu de données initial, on vous demande de créer un second dataframe qui ne contienne que les données des joueurs qui ont perdu les  matchs de la compétition . Dans les données , c'est la colonne `result` qui porte cette information, la valeur `0` signifiant une défaite.   
 
 
 7. Sauvegarder le résultat dans un fichier que vous appelez "defeats.csv"
@@ -858,7 +858,7 @@ ggplot(plotdfx)+
 ```
 
 
-# Programation avec R
+# 'Programation' avec R
 
 Nous savons déjà comment définir une fonction , il nous reste à voir comment écrire les traitements conditionnels, et les boucles. 
 
@@ -991,12 +991,59 @@ for (x in c(1,2,3,4,5,6,7)) {
 ## Boucle `while`
 
 
+
+La boucle `while` s'écrit de la façon suivante  :
+
+```{r while, eval=FALSE}
+while (condition) {
+  #code 
+}
+
+```
+
 ## Applications vectorielles
 
+les application vectorielles sont des variantes des traitements itératifs (boucle `for`),en R elles sont plus efficaces. Elles s'apparentent à de la programmation fonctionnelle.  Les fonctions vectorielles de bases appliquent une fonction à tous les termes d'une collection ou d'une matrice. 
+Les fonctions de base se nomment  `sapply`, `lapply`, `vapply` pour traiter des vecteurs, et `apply`,`mapply` pour traiter des tableaux et des matrices.
+Consultez la documentation pour cerner les différences entre les fonctions de la famille.
+
+
+Nous donnons ici un exemple simple : 
 
 
 
+```{r apply, eval=F}
+my_vec <-  seq(from=10, to=100, by=5)
 
+my_func <- function(x){return(x+2)}
+sapply(my_vec, my_func)
+lapply(my_vec, my_func)
+```
+Notez la différence du résultat de `sapply` et `lapply` en terme de type.
+
+
+# Exercice #5
+Implémentez en R le [crible d'ératosthène](https://fr.wikipedia.org/wiki/Crible_d%27%C3%89ratosth%C3%A8ne)
+
+
+Vous pouvez vous inspirer du pseudo code suivant :
+ ```{r,tidy=FALSE, eval=FALSE, highlight=FALSE  }
+ Fonction Eratosthène(Limite)
+    L = tableau de booléen de taille Limite, initialisé à Vrai
+    Mettre à Faux les cases d'indice pair > 2
+    L[1] = Faux
+    i=3
+    Tant que i*i≤Limite
+        Si L[i]
+            Pour j de i*i à Limite par pas de 2*i
+                L[j] = Faux
+            Fin pour
+        Fin si
+        i=i+1
+    Fin tant que
+    Retourner L
+Fin fonction
+ ```
 
 
 
