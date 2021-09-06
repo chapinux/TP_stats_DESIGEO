@@ -165,7 +165,7 @@ ecdf(means)(75.27)
 
 
 
-On procède ensuite ar tâtonnement : ici, en lisant sur le graphique, on se doute que la valeur de x (ici x correspond aux moyennes calculées dans les échantillons)  correspondant à une proportion de 0.025 se trouve entre x=62 et x= 65, on peut tâtonner dans la console en ajustant à la main la valeur de x, jusqu'à trouver une valeur proche des 2.5% attendus.  
+On procède ensuite par tâtonnement : ici, en lisant sur le graphique, on se doute que la valeur de x (ici x correspond aux moyennes calculées dans les échantillons)  correspondant à une proportion de 0.025 se trouve entre x=62 et x= 65, on peut tâtonner dans la console en ajustant à la main la valeur de x, jusqu'à trouver une valeur proche des 2.5% attendus.  
 
 
 # Exercice : Calculer la fonction de répartition  empirique 
@@ -203,7 +203,7 @@ Prenons une valeur au hasard dans le domaine de définition de nos nombres : $[5
 
 Comptons combien de nombre dans notre échantillons `nbrs` sont inférieurs ou égaux à cette valeur, avec la fonction `sum`, qui lorsque qu'elle traite des vecteur de booléens, compte le nombre de valeurs vraies:
 
-```{r ecdf_function_tuto_2, echo=T }
+```{r ecdf_function_tuto_3, echo=T }
 sum(nbrs <= 8.5 )
 ```
 Nous avons 5 valeurs inférieurs à 8.5, soit la moitié de notre échantillon.
@@ -252,13 +252,20 @@ Nous allons répliquer le bootstrap en variant le nombre et les tailles d'échan
 Encapsuler la boucle de bootstrap précédente dans une fonction qui prend deux arguments : le nombre de répétitions et la taille de l'échantillon.
 
 
-Faites varier ces deux paramètres dans un intervalle de $[50% ; 400%]$ de leur valeur, discrétisé en 50 valeurs.
-Pour chaque couple de valeurs , 
+Faire varier :
+
+le nombre de tirages bootstrap  dans un intervalle de $[50% ; 400%]$ de sa valeur, discrétisé en 50 valeurs.
+la taille de l'échantillon dans un intervalle de $[50% ; 100%]$ de sa valeur, discrétisé en 50 valeurs.
+
+
+**Attention** , il ne faut pas (trop) faire varier la taille de l'échantillon au delà de la taille de la population de base, car cela donnerait des tendances trompeuses, puisque calculées sur une population "répétée", introduisant des régularités qui n'ont pas forcément lieu d'être.
+
+Puis, pour chaque couple de valeurs , 
 Afficher la taille de l'intervalle de confiance à 95% en fonction des deux arguments, vous pouvez utiliser les méthodes de votre choix pour calculer cet intervalle de confiance, nous supposerons que les distributions des moyennes sont symétriques. 
 
 
 ```{r SAn, echo=F, eval=T, cache=T}
-
+nb_tirages <-  1000
 bootstrap <- function (nb_tirages, taille_ech){
 means <-  vector(mode="numeric", length = nb_tirages)
 for( i in  1: nb_tirages ){
@@ -271,12 +278,12 @@ return(means)
 
 # intervalle de variation des paramètres du bootstrap 
 variation_nb_tir <- round(seq(from= 0.5*nb_tirages, to= 4*nb_tirages, length.out= 50 ))
-variation_spl_size  <- round(seq(from= 0.5*(length(fire_pokemons$HP)), to= 4*(length(fire_pokemons$HP)), length.out= 50 ))
+variation_spl_size  <- round(seq(from= 0.5*(length(fire_pokemons$HP)), to= 1*(length(fire_pokemons$HP)), length.out= 50 ))
 
 
 # dataframe vide pour contenir les resultats à chaque itération 
 resultats_SA <-  data.frame(nb_tirages= numeric(), taille_echantillon= numeric(), moyenne= numeric(), longueurIC=numeric())
-
+h
 
 for (nt in variation_nb_tir) {
   for (s in variation_spl_size)
@@ -309,7 +316,7 @@ pnt <-  ggplot(resultats_SA, aes(x=nb_tirages, y=moyenne ))+
 pnt
 
 
-pss <-  ggplot(resultats_SA, aes(x=taille_echantillon, y=moyenne ))+
+pss <-  ggplot(resultats_SA, aes(x=taille_echantillon, y=moyenne- mean(fire_pokemons$HP)  ))+
   geom_boxplot(aes(group=taille_echantillon))
 pss
 
@@ -338,10 +345,16 @@ pssnt2
 ```
 
 
-# Bootstrap dans le cas d'une regression linéaire 
+# Autres bootstraps 
 
 
-Nous allons appliquer le bootstrap à la régression linéaires pour observer la dispersion des coefficients de la droite de régression et calculer des intervalles de confiance sur ces coefficients. 
+Nous avons réalisé l'estimation et le calcul d'intervalle de confiance de la moyenne des points de vie (variable `HP`) des pokemons de type feu.
+Recommencer la procédure  avec une autre variable et/ou une autre catégorie de pokemons.
+
+# Exercice : pokemons légendaires
+
+
+Élaborer une suite de tests qui réponde à la question suivante : la prise en compte de pokémons légendaires a-t-elle une influence dans le calcul des moyennes et des intervelales de confiance des variables numériques des pokemons 
 
 
 
