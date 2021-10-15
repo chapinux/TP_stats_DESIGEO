@@ -1,0 +1,279 @@
+---
+title: "TP2"
+author: "YM & YM"
+date: "19/08/2021"
+output:
+  html_document :
+  theme: paper
+  toc_float:
+    collapsed: true
+  toc: yes
+  highlight: tango
+  number_sections: yes
+  number_subsections: yes
+self-contained : yes
+---
+  
+  
+
+## Exercice 0 : somme d'échantillons tirés dans une loi normale 
+
+
+>Si on considère deux échantillons tirés dans une loi normale de moyenne 0 et d'écart type 1 , quelle sera la moyenne de leur somme ? 
+la taille des échantillons a-t-elle une influence ?
+
+>Vous pouvez mobiliser le code précédent pour appuyer votre réponse.
+
+
+
+Il suffit d'ajouter dans la boucle d'itération sur la taille des échantillons un second échantillon et un second vecteur de moyenne et d'en réaliser après la boucle `for`
+
+
+```{r correct2, echo=T, eval=T}
+taille <-  seq(from=0, to= 500, by=1)
+moyennes1 <-  c()
+moyennes2 <-  c()
+
+for (t in taille){
+  echantillon1 <- rnorm(t, 0,1 )
+  echantillon2 <- rnorm(t, 0,1 )
+  
+  moyenne_courante1 <-  mean(echantillon1)
+  moyenne_courante2 <-  mean(echantillon2)
+  
+  moyennes1 <-  c(moyennes1, moyenne_courante1)
+  moyennes2 <-  c(moyennes2, moyenne_courante2)
+}
+somme_de_normales <-  moyennes1/moyennes2
+
+#résultats
+df <-  data.frame(taille, somme_de_normales)
+#affichage avec des lignes
+plot(df, type="l")
+```
+
+
+
+
+
+## Exercice 0 bis : quotient d'échantillons tirés dans une loi normale
+
+>Même question avec cette fois le quotient des deux échantillons.
+
+
+Il suffit de remplacer la fin du code précédent par : 
+
+
+```{r warmup7, echo=T, eval=F}
+quotient <-  moyennes1/moyennes2
+
+df <-  data.frame(taille, quotient)
+df
+plot(df, type="l")
+
+
+```
+
+
+
+
+```{r datasetup, echo=F,warning=F, message=FALSE}
+library(dplyr)
+library(ggplot2)
+pokedata <-  read.csv(file = "./pokemons.csv")
+fire_pokemons <- pokedata %>% filter(Type.1=="Fire")
+```
+
+
+# Exercice 1 : Bootstrap sur la moyenne
+
+>Le dataset des pokemons de type feu contient 52 individus.
+>Coder une boucle qui réalise un certain nombre de fois  : 
+  
+>- l'échantillonnage (avec remise) de taille 52 parmi ces pokemons. 
+>- le calcul de la moyenne de cet échantillon 
+>- le stockage de la valeur moyenne dans un vecteur
+
+
+
+```{r meanboot, echo=T}
+
+#consitution du dataset des pokemons de type Feu 
+pokedata <-  read.csv(file = "./pokemons.csv")
+fire_pokemons <- filter(pokedata,Type.1=="Fire")
+# syntaxe alternative avec l'oprateur de pipe de dplyr 
+fire_pokemons <- pokedata %>% filter(Type.1=="Fire")
+
+
+nb_tirages <-  1000
+means <-  vector(mode="numeric", length = nb_tirages)
+for( i in  1: nb_tirages ){
+  spl <-  sample(fire_pokemons$HP, size = 52, replace = T)
+  means[i] <-  mean(spl)
+}
+```
+
+> Afficher l'histogramme des moyennes estimées.
+
+  
+  
+```{r hist_mean, echo=T}
+hist(means, breaks= 50)
+```
+
+
+
+
+# Exercice : Calculer la fonction de répartition  empirique 
+
+>Écrire une fonction qui calcule , à partir d'un vecteur de valeurs numériques $v$, la fonction de répartition empirique $v$.
+>Idéalement, donner le résultat sous la forme d'un dataframe contenant le vecteur $v$ trié par ordre croissant et les valeurs de la fonction de répartition correspondantes.
+
+
+>La fonction de répartition empirique est une fonction qui, pour un vecteur de valeurs numériques $v$, donne pour chaque valeur $v_i$ la probabilité dans $v$ d'avoir une valeur inférieur ou égale à $v_i$.
+
+
+
+
+
+
+
+```{r ecdf_function, echo=T }
+cumulated_proportion <- function(v){
+  values <- v 
+  ecd <- cumsum(v) /sum(v)
+  result <-  dataframe(values, ecd)
+  return(result)
+}
+```
+
+
+
+
+# Exercice :  sensibilité aux paramètres du bootstrap
+
+
+
+Lors d'un bootstrap, rien n'interdit d'échantillonner "plus grand" que les données (et même plus petit) , puisqu'on effectue des tirages **avec remise**. 
+
+Pour autant, il n'existe pas de règle simple qui fixe la taille de l'échantillon, ni le nombre d'échantillons à prendre.
+Nous allons répliquer le bootstrap en variant le nombre et les tailles d'échantillons, et d'observer la variation des estimateur et de leurs intervalles de confiances, pour en saisir l'influence. 
+
+
+
+Encapsuler la boucle de bootstrap précédente dans une fonction qui prend deux arguments : le nombre de répétitions et la taille de l'échantillon.
+
+
+Faire varier :
+
+le nombre de tirages bootstrap  dans un intervalle de $[50% ; 400%]$ de sa valeur, discrétisé en 50 valeurs.
+la taille de l'échantillon dans un intervalle de $[50% ; 100%]$ de sa valeur, discrétisé en 50 valeurs.
+
+
+**Attention** , il ne faut pas (trop) faire varier la taille de l'échantillon au delà de la taille de la population de base, car cela donnerait des tendances trompeuses, puisque calculées sur une population "répétée", introduisant des régularités qui n'ont pas forcément lieu d'être.
+
+Puis, pour chaque couple de valeurs , 
+Afficher la taille de l'intervalle de confiance à 95% en fonction des deux arguments, vous pouvez utiliser les méthodes de votre choix pour calculer cet intervalle de confiance, nous supposerons que les distributions des moyennes sont symétriques. 
+
+
+```{r SAn, echo=F, eval=T, cache=T}
+nb_tirages <-  1000
+bootstrap <- function (nb_tirages, taille_ech){
+  means <-  vector(mode="numeric", length = nb_tirages)
+  for( i in  1: nb_tirages ){
+    spl <-  sample(fire_pokemons$HP, size = taille_ech, replace = T)
+    means[i] <-  mean(spl)
+  }
+  return(means)
+}
+
+
+# intervalle de variation des paramètres du bootstrap 
+variation_nb_tir <- round(seq(from= 0.5*nb_tirages, to= 4*nb_tirages, length.out= 50 ))
+variation_spl_size  <- round(seq(from= 0.5*(length(fire_pokemons$HP)), to= 1*(length(fire_pokemons$HP)), length.out= 50 ))
+
+
+# dataframe vide pour contenir les resultats à chaque itération 
+resultats_SA <-  data.frame(nb_tirages= numeric(), taille_echantillon= numeric(), moyenne= numeric(), longueurIC=numeric())
+
+
+for (nt in variation_nb_tir) {
+  for (s in variation_spl_size)
+  {
+    means_btstrp <- bootstrap(nt, s)
+    IC_length <- quantile(means_btstrp, c(0.025, 0.975))[2] - quantile(means_btstrp, c(0.025, 0.975))[1]
+    estim_mean <-  mean(means_btstrp)
+    
+    # création de la ligne de résultat
+    result_line <- c(nt, s, estim_mean, IC_length)
+    names(result_line) <- c("nb_tirages", "taille_echantillon", "moyenne", "longueurIC")
+    resultats_SA <- rbind(resultats_SA, result_line) # empile la ligne de résultat courant dans le dataset Resultat
+  }
+}
+
+names(resultats_SA) <-  c("nb_tirages", "taille_echantillon", "moyenne", "longueurIC")
+
+```
+
+## Exercice: Interprétation des résultats de l'étude  de sensibilité 
+
+Commenter les graphiques obtenus (les vôtres où  ceux donnés ci-dessous).
+Quel est l'effet le plus notable des deux paramètres du bootstrap ?
+
+```{r SA_plot}
+
+pnt <-  ggplot(resultats_SA, aes(x=nb_tirages, y=moyenne ))+
+   geom_boxplot(aes(group=nb_tirages))
+
+pnt
+
+
+pss <-  ggplot(resultats_SA, aes(x=taille_echantillon, y=moyenne- mean(fire_pokemons$HP)  ))+
+  geom_boxplot(aes(group=taille_echantillon))
+pss
+
+pntlIC <-  ggplot(resultats_SA, aes(x=nb_tirages, y=longueurIC ))+
+   geom_boxplot(aes(group=nb_tirages))
+
+pntlIC
+
+
+psslIC <-  ggplot(resultats_SA, aes(x=taille_echantillon, y=longueurIC ))+
+  geom_boxplot(aes(group=taille_echantillon))
+psslIC
+
+
+
+
+pssnt <-  ggplot(resultats_SA, aes(x=taille_echantillon, y=nb_tirages ))+
+  geom_point(aes(color=longueurIC))
+pssnt
+
+
+pssnt2 <-  ggplot(resultats_SA, aes(x=taille_echantillon, y=nb_tirages ))+
+  geom_point(aes(color=moyenne))
+pssnt2
+
+```
+
+
+# Autres bootstraps 
+
+
+Nous avons réalisé l'estimation et le calcul d'intervalle de confiance de la moyenne des points de vie (variable `HP`) des pokemons de type feu.
+Recommencer la procédure  avec une autre variable et/ou une autre catégorie de pokemons.
+
+# Bootstrap sur une corrélation 
+
+
+
+On dispose des données suivantes, entre  
+
+
+# Exercice : pokemons légendaires
+
+Élaborer une suite de tests qui réponde à la question suivante : la prise en compte de pokémons légendaires a-t-elle une influence dans le calcul des moyennes et des intervalles de confiance d'une variable numérique (au choix) des pokemons ?
+  
+  
+  
+  

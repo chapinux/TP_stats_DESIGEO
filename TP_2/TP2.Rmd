@@ -15,10 +15,125 @@ self-contained : yes
 ---
 
 
-# Setup 
 
 
-Récupérer le fichier contenant les caractéristiques des pokemons 
+# Échauffement
+
+
+## Calcul de la moyenne d'un échantillon gaussien avec R 
+
+
+Comme vous le savez déjà , on calcule la moyenne d'un vecteur avec la fonction `mean` 
+
+
+```{r warmup}
+mean(c(3.14, 11.43, 2.7,1.414, 1.618))
+```
+
+
+R propose une fonction pour échantillonner dans une loi Normale : la fonction `rnorm`.
+Les arguments sont dans l'ordre : 
+- `n` le nombre de valeurs souhaitées
+- `mean` , l'espérance de la variable 
+- `sd` , son écart-type (attention ! ce n'est pas la variance ! )
+
+```{r warmup2}
+my_sample <- rnorm(500, 10, 2 )
+head(my_sample)
+```
+
+La ligne de code suivante calcule la moyenne de l'échantillon : 
+
+
+
+```{r warmup3}
+mean(my_sample)
+```
+
+## Estimation de la moyenne d'échantillons de taille variable
+
+
+On va créer des échantillons dont la taille variera de  0 à 100 par pas de 1. On commence par créer les tailles à l'aide de la fonction `seq`  : 
+
+```{r warmup4}
+taille <-  seq(from=0, to= 100, by=1)
+```
+
+Pour chaque valeur de taille, on tire un échantillon dans la loi Normale (moyenne 0 et écart-type 1) de la taille correspondante, et on calcule sa moyenne, qu'on range dans une liste  : 
+
+
+```{r warmup5}
+moyenne <-  c()
+for (t in taille){
+  echantillon <- rnorm(t, 0,1 )
+  moyenne_courante <-  mean(echantillon)
+  moyenne <-  c(moyenne, moyenne_courante)
+}
+head(moyenne)
+```
+
+
+Pour faciliter l'affichage, on va joindre les valeurs des moyennes avec les tailles d'échantillons. 
+On utilise ensuite la fonction `plot`
+
+```{r warmup6, cache=T}
+df <-  data.frame(taille, moyenne)
+head(df)
+plot(df, type="l")
+```
+
+
+
+Comment interpréter ce graphique ? 
+Si la tendfance ne vous apparaît pas clairement, augmentez la taille maximale d'échantillon.
+
+
+## Exercice 0 : somme d'échantillons tirés dans une loi normale 
+
+
+Si on considère deux échantillons tirés dans une loi normale de moyenne 0 et d'écart type 1 , quelle sera la moyenne de leur somme ? 
+la taille des échantillons a-t-elle une influence ?
+
+Vous pouvez mobiliser le code précédent pour appuyer votre réponse.
+
+
+## Exercice 0 bis : quotient d'échantillons tirés dans une loi normale
+
+
+Même question avec cette fois le quotient des deux échantillons.
+
+
+```{r warmup7, echo=F, eval=F}
+taille <-  seq(from=0, to= 500, by=1)
+moyennes1 <-  c()
+moyennes2 <-  c()
+
+for (t in tailles){
+  echantillon1 <- rnorm(t, 0,1 )
+  echantillon2 <- rnorm(t, 0,1 )
+  
+  moyenne_courante1 <-  mean(echantillon1)
+  moyenne_courante2 <-  mean(echantillon2)
+  
+  moyennes1 <-  c(moyennes1, moyenne_courante1)
+  moyennes2 <-  c(moyennes2, moyenne_courante2)
+}
+quotient <-  moyennes1/moyennes2
+
+df <-  data.frame(taille, quotient)
+df
+plot(df, type="l")
+
+
+```
+
+
+
+
+# Mise en place du TP2: bootstrap sur les Pokemons 
+
+
+Récupérer le fichier contenant les caractéristiques des pokemons  dans le répertoire partagé de la formation.
 
 Nous allons nous intéresser aux points de vie (variable `HP`) du jeu de données: 
 ```{r datasetup}
@@ -283,7 +398,7 @@ variation_spl_size  <- round(seq(from= 0.5*(length(fire_pokemons$HP)), to= 1*(le
 
 # dataframe vide pour contenir les resultats à chaque itération 
 resultats_SA <-  data.frame(nb_tirages= numeric(), taille_echantillon= numeric(), moyenne= numeric(), longueurIC=numeric())
-h
+
 
 for (nt in variation_nb_tir) {
   for (s in variation_spl_size)
@@ -351,10 +466,16 @@ pssnt2
 Nous avons réalisé l'estimation et le calcul d'intervalle de confiance de la moyenne des points de vie (variable `HP`) des pokemons de type feu.
 Recommencer la procédure  avec une autre variable et/ou une autre catégorie de pokemons.
 
+# Bootstrap sur une corrélation 
+
+
+
+On dispose des données suivantes, entre  
+
+
 # Exercice : pokemons légendaires
 
-
-Élaborer une suite de tests qui réponde à la question suivante : la prise en compte de pokémons légendaires a-t-elle une influence dans le calcul des moyennes et des intervelales de confiance des variables numériques des pokemons 
+Élaborer une suite de tests qui réponde à la question suivante : la prise en compte de pokémons légendaires a-t-elle une influence dans le calcul des moyennes et des intervalles de confiance d'une variable numérique (au choix) des pokemons ?
 
 
 
