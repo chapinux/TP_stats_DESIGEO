@@ -1,7 +1,7 @@
 ---
-title: "TP2"
-author: "YM & YM"
-date: "19/08/2021"
+title: "TP2 Corrigé "
+author: "PC & YM"
+date: "2022"
 output:
   html_document :
   theme: paper
@@ -44,7 +44,7 @@ for (t in taille){
   moyennes1 <-  c(moyennes1, moyenne_courante1)
   moyennes2 <-  c(moyennes2, moyenne_courante2)
 }
-somme_de_normales <-  moyennes1/moyennes2
+somme_de_normales <-  moyennes1+moyennes2
 
 #résultats
 df <-  data.frame(taille, somme_de_normales)
@@ -166,8 +166,8 @@ Encapsuler la boucle de bootstrap précédente dans une fonction qui prend deux 
 
 Faire varier :
 
-le nombre de tirages bootstrap  dans un intervalle de $[50% ; 400%]$ de sa valeur, discrétisé en 50 valeurs.
-la taille de l'échantillon dans un intervalle de $[50% ; 100%]$ de sa valeur, discrétisé en 50 valeurs.
+le nombre de tirages bootstrap  dans un intervalle de $[50\% ; 400\%]$ de sa valeur, discrétisé en 50 valeurs.
+la taille de l'échantillon dans un intervalle de $[50\% ; 100\%]$ de sa valeur, discrétisé en 50 valeurs.
 
 
 **Attention** , il ne faut pas (trop) faire varier la taille de l'échantillon au delà de la taille de la population de base, car cela donnerait des tendances trompeuses, puisque calculées sur une population "répétée", introduisant des régularités qui n'ont pas forcément lieu d'être.

@@ -1,7 +1,7 @@
 ---
 title: "TP2"
-author: "YM & YM"
-date: "19/08/2021"
+author: "YM & PC"
+date: "2022"
 output: 
    html_document :
      theme: paper
@@ -31,7 +31,8 @@ mean(c(3.14, 11.43, 2.7,1.414, 1.618))
 ```
 
 
-R propose une fonction pour échantillonner dans une loi Normale : la fonction `rnorm`.
+R propose une fonction pour échantillonner dans une loi Normale la fonction `rnorm`.
+
 Les arguments sont dans l'ordre : 
 - `n` le nombre de valeurs souhaitées
 - `mean` , l'espérance de la variable 
@@ -363,20 +364,17 @@ Pour autant, il n'existe pas de règle simple qui fixe la taille de l'échantill
 Nous allons répliquer le bootstrap en variant le nombre et les tailles d'échantillons, et d'observer la variation des estimateur et de leurs intervalles de confiances, pour en saisir l'influence. 
 
 
-
-Encapsuler la boucle de bootstrap précédente dans une fonction qui prend deux arguments : le nombre de répétitions et la taille de l'échantillon.
-
-
-Faire varier :
-
-le nombre de tirages bootstrap  dans un intervalle de $[50% ; 400%]$ de sa valeur, discrétisé en 50 valeurs.
-la taille de l'échantillon dans un intervalle de $[50% ; 100%]$ de sa valeur, discrétisé en 50 valeurs.
-
-
 **Attention** , il ne faut pas (trop) faire varier la taille de l'échantillon au delà de la taille de la population de base, car cela donnerait des tendances trompeuses, puisque calculées sur une population "répétée", introduisant des régularités qui n'ont pas forcément lieu d'être.
 
-Puis, pour chaque couple de valeurs , 
-Afficher la taille de l'intervalle de confiance à 95% en fonction des deux arguments, vous pouvez utiliser les méthodes de votre choix pour calculer cet intervalle de confiance, nous supposerons que les distributions des moyennes sont symétriques. 
+
+ 1. Encapsuler la boucle de bootstrap précédente dans une fonction qui prend deux arguments : le nombre de répétitions et la taille de l'échantillon.
+
+ 2. Faire varier :
+      - le nombre de tirages bootstrap  dans un intervalle de $[50% ; 400%]$ de sa valeur, discrétisé en 50 valeurs.
+      - la taille de l'échantillon dans un intervalle de $[50% ; 100%]$ de sa valeur, discrétisé en 50 valeurs.
+Puis, pour chaque couple de valeurs : 
+
+ 3. Afficher la taille de l'intervalle de confiance à 95% en fonction des deux arguments, vous pouvez utiliser les méthodes de votre choix pour calculer cet intervalle de confiance, nous supposerons que les distributions des moyennes sont symétriques. 
 
 
 ```{r SAn, echo=F, eval=T, cache=T}
@@ -460,17 +458,38 @@ pssnt2
 ```
 
 
-# Autres bootstraps 
+# Exercice : Autres bootstraps 
 
 
 Nous avons réalisé l'estimation et le calcul d'intervalle de confiance de la moyenne des points de vie (variable `HP`) des pokemons de type feu.
 Recommencer la procédure  avec une autre variable et/ou une autre catégorie de pokemons.
 
-# Bootstrap sur une corrélation 
+# Exercice Bootstrap sur une corrélation 
+
+On dispose des données d'attaque et de défense des pokemons. 
+
+Voici l'allure du nuage de points pour tous les pokemons, colorés par génération.
 
 
+```{r AttbsDefbyGenplot}
 
-On dispose des données suivantes, entre  
+pokedata$Generation <-  as.factor(pokedata$Generation)
+ggplot(pokedata)+
+  geom_point(aes(x=Attack, y =Defense, color= Generation))
+```
+
+
+la correlation entre ces deux variables peut être obtenues directement par R , avec la fonction `cor`
+
+
+```{r Att.vs.Def.byGenCor}
+cor(pokedata$Attack, pokedata$Defense)
+```
+
+Réaliser un bootstrap pour encadrer cette valeur de corrélation en échantillonnant dans toute la population.
+
+L'intervalle obtenu varie-t-il en fonction de la génération des pokemons ? 
+
 
 
 # Exercice : pokemons légendaires

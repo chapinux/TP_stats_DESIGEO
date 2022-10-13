@@ -1,7 +1,7 @@
 ---
 title: "Premières manipulations avec R"
 author: "PC"
-date: "2021"
+date: "2022"
 output: 
    html_document :
      theme: paper
@@ -74,7 +74,7 @@ a + 10
 
 Les types primitifs en R sont : `numeric` , `character` (string) , `logical` (booléen), et `factor`
 
-Voici des exemples d'instantiation:
+Voici des exemples d'instanciation:
 
 ```{r decl2}
 nunu <-  12.5
@@ -112,7 +112,7 @@ coco
 
 ## Modifier un élément
 
-Connaissant son index (= sa position dans le vecteur),  la modification de la valeur d'un élément  se fait à l'aide de l'opérateur d'affectation : 
+Connaissant son **index** (= sa position dans le vecteur),  la modification de la valeur d'un élément  se fait à l'aide de l'opérateur d'affectation : 
 
 
 ```{r vecmodif}
@@ -145,6 +145,30 @@ coco[-5]
 # pour supprimer effectivement le cinquième élément , il faut mettre à jour la variable avec une affectation 
 coco <- coco[-5]
 ```
+
+
+
+## Retrouver un élément par sa valeur
+
+On utilise la fonction `match`, qui renvoie le **premier** index auquel on trouve la valeur dans le vecteur.
+
+
+```{r vecfind}
+tortues_ninja <-  c("Leonardo", "Raphaël", "Donatello", "Michelangelo", "Donatello")
+match("Donatello", tortues_ninja )
+
+
+```
+
+Pour trouver **tous les emplacements** d'une valeur dans un vecteur, utiliser la fonction `which` appliquée à une expression booléenne.
+
+```{r vecfindall}
+tortues_ninja <-  c("Leonardo", "Raphaël", "Donatello", "Michelangelo", "Donatello")
+tortues_ninja == "Donatello"
+which(tortues_ninja == "Donatello")
+```
+
+Autrement dit, `which` donne la position des valeurs vraies dans un vecteur de booléens. 
 
 
 # Liste 
@@ -183,7 +207,7 @@ names(lili2)
 ## Modifier un élément
 
 
-Pour modifier un élément, à un index donné, on utilise les doubles crochets et l'affectation :
+Pour modifier un élément, à un index donné, on utilise les **doubles crochets** et l'affectation :
 
 ```{r lilimodif}
 lili2[[2]] <- "bla bla bla bla pookie"
@@ -215,6 +239,21 @@ lili
 Notez l'emploi des doubles crochets pour accéder à un élément de la liste, à la différence du crochet simple pour les vecteurs.
 
 
+## Retrouver un élément dans une list 
+
+Les fonctions `match` et `which` fonctionnent également sur les listes (cf. section 3.4).
+
+Dans l'exemple ci dessus, je crée une **liste nommée**, en nommant directement les éléments à la création. 
+
+```{r findelemlili}
+turtles_color <-  list(Leonardo="blue", Raphael="red", Donatello="purple", Michelangelo="orange")
+turtles_color
+match("orange", turtles_color)
+which(turtles_color == "red") 
+```
+
+NB: le résultat renvoyé par `which` est bien un **index** (donc un int), mais il est nommé.
+
 
 # Exercice \#1   
 
@@ -229,13 +268,13 @@ Notez l'emploi des doubles crochets pour accéder à un élément de la liste, �
 
 # Matrices
 
-les matrices sont des tableaux à deux dimensions pour lesquels sont défionies plusieurs fonctions de calcul matriciel.
-une matrice se définit par exemple avec la fonction `matrix()`, en renseignant le contenu de la matrice (argument `data`), et la dimension de celle-ci (arguments `nrow` et `ncol`).
+les matrices sont des tableaux à deux dimensions pour lesquels sont définies plusieurs fonctions de calcul matriciel.
+une matrice se définit par exemple avec la fonction `matrix()`, en renseignant le contenu de la matrice (argument `data`), et la dimension de celle-ci (arguments `nrow` et `ncol` qui donnennt respectivment le nombre de lignes et de colonnes).
 
-Si le nombre de valeurs est inférieur à la taille de la matrice, les valeurs sont **recyclées** , comme le montre l'exemple ci-dessous :
+Si le nombre de valeurs est inférieur à la taille de la matrice, les valeurs sont **recyclées** , c'est à dire réutilisées jusqu'à tout remplir, comme le montre l'exemple ci-dessous :
 
 ```{r matrix1}
-mama <-  matrix(data = 1, nrow = 3, ncol=3)
+mama <-  matrix(data = c(1,2), nrow = 3, ncol=3)
 mama
 ```
 
@@ -261,14 +300,14 @@ Pour accéder à toute une ligne ou toute une colonne , on laisse vide l'index d
 Pour le obtenir le premier vecteur ligne: 
 
 ```{r matrix4}
-mama2[1,]
+mama2[1,] # première ligne
 ```
 
 
 Pour le obtenir le troisième vecteur colonne   : 
 
 ```{r matrix_get_col}
-mama2[,3]
+mama2[,3] #troisième colonne
 ```
 
 
@@ -321,7 +360,7 @@ matrice_Id * 7
 ```
 
 
-## Juxtaposer des matrices 
+## Juxtaposer des matrices (ou des tableaux)
 
 Ces fonctions sont aussi valables pour les dataframe (voir plus bas) , sous réserve de compatibilité de types et de taille. 
 
@@ -370,7 +409,7 @@ names(iris)
 ## Accès aux valeurs
 
 
-un dataframe est un tableau à deux dimensions, on peut donc accéder à la valeur d'un élément avec deux indices placés entre crochets et séparé par une virgule : celui de la ligne voulue puis celui de la colonne voulue
+un dataframe est un tableau à deux dimensions, on peut donc accéder à la valeur d'un élément avec deux indices placés entre crochets et séparé par une virgule : celui de la ligne voulue puis celui de la colonne voulue, comme pour une matrice (cf. ci-dessus)
 
 ```{r irisacces}
 iris[12, 4]
@@ -432,7 +471,7 @@ iris$Species
 ```
 
 
-les colonnes d'un dataframe sont des **vecteurs**, et ce que nous avons vu à leur sujet s'applique.
+les colonnes d'un dataframe sont des **vecteurs**, et tout ce que nous avons vu à leur sujet s'applique.
 
 
 par exemple les opérations arithmétiques s'appliquent :  
@@ -581,7 +620,7 @@ iriscopy[151,]
 ```
 
 La fonction `rbind()` permet de fusionner deux dataframes "l'un au dessus de l'autre".
-il faut pour cela qu'ils aient les mêmes colonnes (nombre et type).
+il faut pour cela qu'ils aient **exactement** les mêmes colonnes (ordre, nombre et type).
 
 
 
