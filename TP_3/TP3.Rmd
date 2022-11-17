@@ -1,7 +1,7 @@
 ---
 title: "TP3 : manipulation avancée avec dplyr "
 author: "PC"
-date: "19/08/2021"
+date: "2022-2023"
 output: 
    html_document :
      theme: paper
@@ -153,8 +153,8 @@ starwars %>% group_by(homeworld)
 ```
 
 
-NB : les lignes n'apparaissent pas "regrouppées" dans la console. Tant qu'elles ne sont pas agrégées par une opération, elles n'ont pas lieu d'être affichées sous forme agrégées. 
-R a simplement noté la présence de groupe, et effectuera des traitements par groupe si on lui demande dans une étape ultérieure. 
+NB : les lignes n'apparaissent pas "regroupées" dans la console. Tant qu'elles ne sont pas agrégées par une opération, elles n'ont pas lieu d'être affichées sous forme agrégées. 
+R a simplement noté la présence de groupe comme l'iondique la deuxième ligne de la sortie : `Groups:homeworld [49]`, et effectuera des traitements par groupe si on lui demande dans une étape ultérieure. 
 
 
 ## Agregéation
@@ -208,9 +208,20 @@ starwars %>% filter (height >150) %>%
 
 
 
-### Création de nouvelles variables
+## Création de nouvelles variables agrégées
 
 
+
+Après un regroupement, il est courant de calculer des métriques sur ces regroupement : des sommes des moyennes etc. 
+
+La création de nouvelles variables se fait à l'aide de la fonction `mutate` de `dplyr`. 
+
+Chaque nouvelle variable calculée est déclarée dans la fonction mutate qui prend en argument une ou plusieurs expressions de la forme: 
+
+`nom_de_ma_nouvelle_variable = fonction(param1,param2,....) `
+
+
+Par exemple  : 
 
 ```{r mutate1, echo=T, eval=T}
 starwars %>%  
@@ -223,7 +234,24 @@ starwars %>%
 
 
 
+dans le bloc de code ci-dessus, après un regroupement (fonction `group_by` ) , deux variables sont créées : `nombre` et `classe_taille`.
+
+La première utilise une fonction particulière de `dplyr` : `n()`, qui compte la taille du groupe courant. 
 
 
+Toute fonction qui retourne un résultat peut être utilisée pour peupler la nouvelle valeur, comme le montre la seconde variable `classe_taille`, qui n'utilise pas particulièrement le regroupement et donne, pour chaque individu une chaîne de caractère fonction de sa variable `height`.  
 
+
+## Exercice:  masse moyenne des pingouins
+
+ Le jeu de données `palmerpinguins` contient des données sur les puingouins de trois îles et de trois espèces. 
+ 
+ 1. Compter le nombre de pingouins de chaque espèce dans chaque île, à l'aide de la fonction `n()` qui après un regroupement compte le nombre d'individus d'un groupe. 
+ 2. Calculer la masse moyenne de ces pingouins.
+ 
+ 
+ 
+ 
+ 
+ 
 

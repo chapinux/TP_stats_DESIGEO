@@ -1642,13 +1642,13 @@ arrondi (fonction <code>round()</code> avec le calcul de la moyenne
 (fonction <code>mean()</code>) sur un vecteur de valeurs entières.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>valeurs <span class="ot">&lt;-</span>  <span class="fu">rnorm</span>(<span class="dv">50</span>,<span class="at">mean =</span> <span class="dv">20</span>, <span class="at">sd=</span><span class="dv">1</span>) <span class="co">#50 échantillons dans une loi normale</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>valeurs</span></code></pre></div>
-<pre><code>##  [1] 20.30185 21.07627 22.12484 20.56535 19.21625 22.11746 21.74952 22.50625
-##  [9] 19.33437 21.28389 19.76074 20.85427 19.52983 20.11299 19.36557 19.79808
-## [17] 20.42097 18.67631 20.82815 18.35983 19.42541 19.22129 19.56379 20.53037
-## [25] 20.59936 20.32560 18.54013 20.63571 21.01100 18.99510 20.02081 20.32842
-## [33] 21.65020 18.56446 20.26754 20.22602 21.29255 18.09908 19.21725 20.05764
-## [41] 19.67693 18.51026 20.93037 18.70081 21.30496 19.74276 20.43699 19.99429
-## [49] 20.31076 19.68421</code></pre>
+<pre><code>##  [1] 19.05280 23.25982 19.05823 21.29547 19.43331 21.77098 20.68575 20.70816
+##  [9] 20.80156 21.13307 19.56944 20.46061 20.43371 19.90256 20.76072 18.42936
+## [17] 21.54403 20.43449 20.51373 19.56041 22.26516 20.33778 19.27792 20.41731
+## [25] 18.66412 19.12689 21.27054 18.70124 19.71977 20.51531 19.82511 21.42149
+## [33] 20.03308 20.87136 18.93743 21.01344 19.72395 21.53463 20.92511 19.36229
+## [41] 20.26794 19.97026 19.87843 19.46888 18.52529 19.89142 18.33276 20.82237
+## [49] 17.39980 20.12954</code></pre>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>valeurs <span class="sc">%&gt;%</span> round <span class="sc">%&gt;%</span> mean</span></code></pre></div>
 <pre><code>## [1] 20.14</code></pre>
 <p>NB : en l’absence d’arguments supplémentaires dans les fonctions
@@ -2197,11 +2197,12 @@ fonction<code>group_by</code>.</p>
 ## 10 Obi-Wan…    182    77 auburn, w… fair       blue-gray       57   male  mascu…
 ## # … with 77 more rows, and 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;,
 ## #   films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;</code></pre>
-<p>NB : les lignes n’apparaissent pas “regrouppées” dans la console.
-Tant qu’elles ne sont pas agrégées par une opération, elles n’ont pas
-lieu d’être affichées sous forme agrégées. R a simplement noté la
-présence de groupe, et effectuera des traitements par groupe si on lui
-demande dans une étape ultérieure.</p>
+<p>NB : les lignes n’apparaissent pas “regroupées” dans la console. Tant
+qu’elles ne sont pas agrégées par une opération, elles n’ont pas lieu
+d’être affichées sous forme agrégées. R a simplement noté la présence de
+groupe comme l’iondique la deuxième ligne de la sortie :
+<code>Groups:homeworld [49]</code>, et effectuera des traitements par
+groupe si on lui demande dans une étape ultérieure.</p>
 </div>
 <div id="agregéation" class="section level2" number="2.5">
 <h2><span class="header-section-number">2.5</span> Agregéation</h2>
@@ -2650,9 +2651,19 @@ ordonné par nombre décroissant :</p>
 </tr>
 </tbody>
 </table>
-<div id="création-de-nouvelles-variables" class="section level3" number="2.6.1">
-<h3><span class="header-section-number">2.6.1</span> Création de
-nouvelles variables</h3>
+</div>
+<div id="création-de-nouvelles-variables-agrégées" class="section level2" number="2.7">
+<h2><span class="header-section-number">2.7</span> Création de nouvelles
+variables agrégées</h2>
+<p>Après un regroupement, il est courant de calculer des métriques sur
+ces regroupement : des sommes des moyennes etc.</p>
+<p>La création de nouvelles variables se fait à l’aide de la fonction
+<code>mutate</code> de <code>dplyr</code>.</p>
+<p>Chaque nouvelle variable calculée est déclarée dans la fonction
+mutate qui prend en argument une ou plusieurs expressions de la
+forme:</p>
+<p><code>nom_de_ma_nouvelle_variable = fonction(param1,param2,....)</code></p>
+<p>Par exemple :</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>starwars <span class="sc">%&gt;%</span>  </span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>          <span class="fu">group_by</span>(homeworld,species,) <span class="sc">%&gt;%</span> </span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>( <span class="at">nombre =</span> <span class="fu">n</span>(),</span>
@@ -2674,7 +2685,28 @@ nouvelles variables</h3>
 ##  9 Tatooine  Human        8 grand        
 ## 10 Stewjon   Human        1 grand        
 ## # … with 77 more rows</code></pre>
+<p>dans le bloc de code ci-dessus, après un regroupement (fonction
+<code>group_by</code> ) , deux variables sont créées :
+<code>nombre</code> et <code>classe_taille</code>.</p>
+<p>La première utilise une fonction particulière de <code>dplyr</code> :
+<code>n()</code>, qui compte la taille du groupe courant.</p>
+<p>Toute fonction qui retourne un résultat peut être utilisée pour
+peupler la nouvelle valeur, comme le montre la seconde variable
+<code>classe_taille</code>, qui n’utilise pas particulièrement le
+regroupement et donne, pour chaque individu une chaîne de caractère
+fonction de sa variable <code>height</code>.</p>
 </div>
+<div id="exercice-masse-moyenne-des-pingouins" class="section level2" number="2.8">
+<h2><span class="header-section-number">2.8</span> Exercice: masse
+moyenne des pingouins</h2>
+<p>Le jeu de données <code>palmerpinguins</code> contient des données
+sur les puingouins de trois îles et de trois espèces.</p>
+<ol style="list-style-type: decimal">
+<li>Compter le nombre de pingouins de chaque espèce dans chaque île, à
+l’aide de la fonction <code>n()</code> qui après un regroupement compte
+le nombre d’individus d’un groupe.</li>
+<li>Calculer la masse moyenne de ces pingouins.</li>
+</ol>
 </div>
 </div>
 

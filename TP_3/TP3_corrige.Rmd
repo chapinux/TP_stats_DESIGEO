@@ -1,0 +1,315 @@
+---
+title: "TP3 Corrigé "
+author: "PC"
+date: "2022-2023"
+output: 
+   html_document :
+     theme: paper
+     toc_float: 
+        collapsed: true
+     toc: yes
+     highlight: breezedark
+     number_sections: yes
+     number_subsections: yes
+self-contained : yes
+---
+  
+  
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+  
+  
+
+# Échauffement : Calcul du mode
+
+
+> Écrire une fonction qui calcule le mode d'une variable continue , prenant en argument un vecteur de valeurs, et un nombre d'intervalles qui discrétise son étendue. 
+
+
+On commence par discrétiser la variable en intervalles de longueur égale avec la fonction `cut`.
+
+Cette fonction prend un vecteur en entrée et :
+
+1. discrétise l'étendue du vecteur d'entrée en intervalle semi-ouverts et des étiquettes (labels) correspondantes
+2. retourne un vecteur de même taille , constitué des labels de l'intervalle dans lequel se situe chaque valeur du vecteur d'entrée 
+
+```{r genDatetcut, message=FALSE}
+
+variable_continue <-  rnorm(20, 5,1)
+
+intervalle_dappartenance  <-  cut(variable_continue,10) #on demande 10 intervalles
+intervalle_dappartenance
+```
+
+
+On a donc pour chaque valeur (individu), le label de l'intervalle dans lequel il se situe.
+On cherche maintenant l'intervalle qui contient le plus d'individus. 
+Pour manipuler facilement les données , on crée un dataframe avec une colonne `valeur` contenant les valeurs , et une colonne `etiquette` contenant les étiquettes correspondantes, dont voici les première lignes : 
+
+```{r countmax}
+mydata <- data.frame(valeur=variable_continue, etiquette=intervalle_dappartenance)
+head(mydata)
+```
+
+
+
+Il s'agit maintenant de compter le nombre de valeurs par étiquette et de prendre l'étiquette d'effectif maximal. 
+
+## Syntaxe "classique"
+
+Il y a plusieurs façons de compter les lignes d'un dataframe selon un critère sur une colonne.
+
+
+### Solution 1 : Avec la fonction `table()` (table de contingence)
+
+La façon la plus simple de compter le nombre d'individu selon une variable factorielle (ici l'étiquette) est certainement d'utiliser la fonction `table`. Cette fonction compte les individus selon une variable factorielle , ou le croisement de plusieurs variables factorielles.  
+
+
+```{r findmax}
+table(mydata$etiquette)
+```
+
+Remarquons que le résultat de `table()` est une liste **nommée** : les étiquettes sont les noms.
+
+Il devient assez simple de trouver la valeur maximum : 
+```{r findmax2}
+tbl_conting <-  table(mydata$etiquette)
+maxi <-  max(tbl_conting)
+```
+
+On veut ensuite retrouver l'étiquette (ou les étiquettes en cas d'ex aequo) : on utilise pour ça la fonction `which`, qui retourne les **index**, (par défaut), des valeurs d'une liste pour lesquelles  une certaine expression booléenne est vérifiée : 
+
+
+```{r findmax3}
+which(tbl_conting==maxi) 
+```
+
+Ici , ce n'est pas les index qui nous intéresse mais plutôt les étiquettes, c'est à dire les noms de cette liste nommée. 
+On récupère les noms des étiquettes avec la fonction `names()`
+
+```{r findmax4}
+noms_etiquettes <- names(which(tbl_conting==maxi))
+noms_etiquettes
+```
+
+
+### Solution 2 : Avec la fonction `which()` 
+
+> **N.B.** C'est variante est plus longue, je la donne uniquement pour que vous voyiez qu'on peut obtenir le même résultat de plusieurs façons différentes
+
+La fonction `which` retourne les **index**, (par défaut), des valeurs d'une liste ou d'un vecteur pour lesquelles  une certaine expression booléenne est vérifiée.
+On peut donc trouver toutes les valeurs qui correspondent à la première étiquette, puis itérer : deuxième étiquette, troisième étiquette, etc. 
+
+On peut retrouver les étiquettes crées par la fonction `cut()` à l'aide de la fonction `levels()`, qui donne les modalités d'une variable qualitatives (que R appelle `factor`).
+
+```{r withwhich}
+levels(mydata$etiquette)
+```
+
+
+On identifie ensuite les index des lignes du dataframe dont la variable `etiquette` est égale à la première modalité  avec la fonction `which` : 
+
+
+```{r withwhich2}
+modalite_numero1 <- levels(mydata$etiquette)[1]
+index_modalite_num1 <- which(mydata$etiquette==modalite_numero1) 
+index_modalite_num1
+```
+
+Il y a donc deux individus dans le dataframe qui correspondent à la première étiquette. On peut les compter grâce à la fonction `length()`
+
+
+```{r withwhich3}
+effectif_modalité_numero1 <-  length(index_modalite_num1)
+effectif_modalité_numero1
+```
+
+
+On vient de montrer comment compter les individus dont l'étiquette est celle de la première étiquettes générée par la fonction `cut()`.
+
+On peut généraliser ce code pour l'étendre à toutes les étiquettes : 
+
+```{r withwhich4}
+effectifs <-  c()
+for (modalite in levels(mydata$etiquette)){
+  effectif_courant <- length(which(mydata$etiquette==modalite))
+  effectifs <- c(effectifs, effectif_courant)
+}
+effectifs  
+```
+
+On obtient une liste d'effectifs par modalité, dans l'ordre des modalités, dont on pourra prendre faiclement le maximum, et trouver les index des valeurs égales à ce maximum. 
+
+
+```{r withwhich5}
+effectif_max <-  max(effectifs)
+index_du_ou_des_max <- which(effectifs  == effectif_max)
+index_du_ou_des_max
+```
+
+Comme on a fait les traitements dans l'ordre des étiquettes données par la fonctions `levels()`, on peut récupérer les étiquettes directement avec les index : 
+
+```{r withwhich6}
+levels(mydata$etiquette)[index_du_ou_des_max]
+```
+
+
+## Syntaxe dplyr
+
+Voici comment réaliser ce traitement avec la syntaxe `dplyr`, en enchaînant les traitements : 
+
+```{r countmax2, message=FALSE}
+library(dplyr)
+intervalle_effectif_max  <-  mydata %>%
+  group_by(etiquette) %>%    # on regrouppe les lignes par leur étiquette
+  summarise(effectif = n()) %>%  # on compte le nombre de lignes (fonction n())
+  slice_max(effectif)   # on prend la ligne maximale du group_by
+intervalle_effectif_max 
+```
+
+
+Notez le confort apporté par le `group_by` , qui permet de raisonner sur un dataframe «regrouppé», de compter des lignes dans la fonction `summarise` , et la fonction `slice_max` qui permet de prendre les n premières lignes de plus grande valeur selon une variable.
+
+Dans la suite de ce TP nous allons aborder cette nouvelle syntaxe sur des exemples.
+
+
+## Calcul du mode à partir de l'étiquette d'effectif majoritaire
+
+Il ne reste qu'à calculer la moyenne des bornes de l'intervalle (ou des intervalles ex aequo) contenu dans l'étiquette d'effectif maximal pour obtenir le mode. On pourrait le faire à la main , mais nous allons voir comment le faire programmatiquement, à partir de l'étiquette qui la nomme.
+
+
+On utilise pour cela la librairie `stringr` qui est pratique pour manipuler les chaînes de caractères. 
+Calculons la moyenne des bornes pour une des étiquettes, la troisième du jeu de données par exemple : 
+
+
+```{r extractbound}
+mon_etiquette <- mydata$etiquette[3]
+mon_etiquette
+```
+
+On la convertit en chaîne de caractères : 
+
+
+```{r extractbound2}
+mon_etiquette <-  as.character(mon_etiquette)
+mon_etiquette
+```
+
+On retire de cette chaîne de caractères les parenthèses et les crochets, avec la librairie `stringr` (installez là avant si nécessaire $\rightarrow$ `install.packages("stringr")`)
+
+
+La fonction qui retire un caractère est la fonction `str_remove`. Son premier argument est la chaîne de caractères à traiter. Le second est un *pattern* , comme dans les expressions régulières.
+En pratique il faut mettre entre crochets le caractère à retirer , comme le montre l'exemple ci dessous : 
+
+```{r extractbound3}
+library(stringr)
+str_remove(mon_etiquette, "[(]")
+str_remove(mon_etiquette, "[]]")
+```
+On retire donc les caractères qui sont de part et d'autres des valeurs : la parenthèse ouvrante et le crochet fermant :  
+
+```{r extractbound33}
+mon_etiquette <- str_remove(mon_etiquette, pattern = "[(]")
+mon_etiquette <- str_remove(mon_etiquette, pattern = "[]]")
+```
+
+Enfin, on coupe la chaîne de caractères en deux au niveau de la virgule , avec la fonction `str_split` . L'argument `simplify=T` modifie le type de retour pour avoir une matrice de string au lieu d'une liste
+
+```{r extractbound4}
+bornes <-  str_split(mon_etiquette, pattern=",", simplify = T)
+bornes
+```
+
+On peut enfin calculer la moyenne , après avoir transformé les éléments de la matrice , qui sont des string, en valeurs numériques: 
+
+
+```{r extractbound5}
+borne_inf <-  as.numeric(bornes[1,1])
+borne_sup <-  as.numeric(bornes[1,2])
+moy_bornes <-  mean(borne_inf, borne_sup)
+moy_bornes
+```
+
+
+Rassemblons toutes ces étapes dans une fonction, qui a partir d'une étiquette (argument `label`), calcule la moyenne de ses bornes : 
+
+
+
+
+```{r foncvalfromlabel}
+mean_value_from_cut_labels <- function(label){
+  label <-  as.character(label)
+  label <- str_remove(label, "[(]")
+  label <-  str_remove(label, "[]]")
+  bornes <-  str_split(label, pattern=",", simplify = T)
+  moy <-  mean(as.numeric(bornes[1,1]), as.numeric(bornes[1,2]))
+  return(moy)
+}
+```
+
+
+Nous avons maintenant tout ce qu'il faut pour calculer le mode d'un vecteurs de valeurs numériques ! 
+
+
+
+ 
+
+# dplyr, l'arme absolue
+
+
+
+
+## Exercice:  masse moyenne des pingouins
+
+ Le jeu de données `palmerpinguins` contient des données sur les puingouins de trois îles et de trois espèces. 
+ 
+> 1. Compter le nombre de pingouins de chaque espèce dans chaque île, à l'aide de la fonction `n()` qui après un regroupement compte le nombre d'individus d'un groupe.
+ 
+ on utilise la fonction `group_by()` qui prend en paramètre des colonnes(variables) du dataframe `penguins` pour opérer le regroupement. 
+ 
+À la suite de ce regroupement, la fonction `summarise()` permet d'opérer des traitements sur les lignes regroupées à l'étape précédente. Le plus simple de ces traitements est de compter les lignes : c'est ce que fait la fonction `n()`, qui va remplir la variable que nous créons sur le moment : `nombre`, dans la fonction `summarise` .
+
+ 
+ 
+```{r groupcount, eval=F, echo=T}
+library(palmerpenguins)
+penguins %>%  
+  group_by(island, species) %>% 
+  summarise(nombre=n())
+```
+ 
+  
+```{r groupcountofff, eval=T, echo=F, message=FALSE}
+library(knitr)
+library(palmerpenguins)
+penguins %>%  
+  group_by(island, species) %>% 
+  summarise(nombre=n()) %>% kable()
+```
+ 
+ 
+ 
+ 
+ 
+ > 2. Calculer la masse moyenne de ces pingouins.
+ 
+ On reprend le code précédent, et dans `summarise()` , on ajoute une autre variable, nommée `masse_moy` , à la quelle on affecte la moyenne des valeurs de la colonne `body_mass_g`, qui sera donc calculée sur les lignes regroupées. On n'oublie pas d'ajouter l'argument `na.rm=T` à la fonction `mean()` de façon à ce que les éventuelles valeurs manquantes n'empêchent pas le calcul. 
+ 
+ 
+ 
+```{r groupcountmoy2, eval=FALSE, echo=T}
+ penguins %>%  
+  group_by(island, species) %>% 
+  summarise(nombre=n(), masse_moy=mean(body_mass_g, na.rm=+T))
+``` 
+```{r groupcountmoy3, eval=TRUE, echo=F, message=F}
+library(knitr)
+ penguins %>%  
+  group_by(island, species) %>% 
+  summarise(nombre=n(), masse_moy=mean(body_mass_g, na.rm=+T)) %>% kable()
+``` 
+
