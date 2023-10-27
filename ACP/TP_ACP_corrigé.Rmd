@@ -1,0 +1,309 @@
+---
+title: "TP ACP corrigé"
+author: "PC & YM"
+date: "28/07/2021"
+output: pdf_document
+urlcolor: blue
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(palmerpenguins)
+library(ade4)
+library(factoextra)
+```
+
+
+## Packages
+
+Plusieurs packages sont disponibles pour réaliser des ACP avec R.
+Dans ce TP nous utiliserons les packages `ade4` qui réalise les calculs  et  `factoextra`  qui fournit des outils pour visualiser les résultats.
+
+```{r packages, eval= F}
+install.packages("ade4")
+install.packages("factoextra")
+```
+
+
+Nous utiliserons aussi un package pour les données : `palmerpenguins`, de Horst AM, Hill AP, Gorman KB (2020) , et qui fournit des mesures de la morphologie de trois espèces de pengouins: 
+  
+  
+```{r penguins, eval= F}
+install.packages("palmerpenguins")
+```
+
+Une fois installés, on charge ces packages ainsi que d'autres déjà connus : `dplyr`, `ggplot2`
+
+```{r libs, eval= F}
+library(dplyr)
+library(ggplot2)
+library(ade4)
+library(factoextra)
+library(palmerpenguins)
+```
+
+## Données 
+
+les données sont décrites sur la page github du package : https://allisonhorst.github.io/palmerpenguins/ 
+
+Nous utiliserons l'objet `penguins` fourni par ce package , dont voici les 6 premières lignes: 
+  
+  
+```{r data}
+data("penguins")
+head(penguins)
+```
+
+### Question 1 : Préparation des données 
+
+Filtrer les observations non attribuées, de façon à ce qu'il n'y ait plus de valeurs `NA` dans le dataframe. 
+
+**Indice** : Utiliser les fonctions `anyNA` et `na.omit`
+
+```{r data_corr}
+# vérifie la présence dee valeurs NA dans les données 
+anyNA(penguins)
+```
+
+`anyNA` permet de vérifier s'il y a des valeurs NA dans les données, `na.omit` renvoie un jeu de données sans les lignes qui contiennent au moins une valeur NA.
+
+```{r data_cor2}
+# vérifie la présence dee valeurs NA dans les données 
+penguins_noNA <- na.omit(penguins)
+```
+
+
+### Question 2 : Affichage des données 
+
+
+Commencer par afficher les noms et les types des variables du dataset `penguins` $\rightarrow$ on utilise la fonction `names()`
+
+
+```{r data_display}
+names(penguins_noNA)
+```
+
+
+Réaliser ensuite :
+  
+- un affichage des nuages de points des variables **numériques** deux à deux  $\rightarrow$ on ne conserve que les variables numériques avec la fonction `select()` de `dplyr` est une clause `where`, on retire la colonne `year`, puis on utilise la fonction `plot()` sur le dataframe 
+
+```{r data_display2, cache=T}
+penguins_noNA_num <-  select(penguins_noNA, where(is.numeric))
+penguins_noNA_num <-  select(penguins_noNA_num,-year)
+plot(penguins_noNA_num)
+```
+
+- calculer leur corrélations  $\rightarrow$ on utilise  la fonction `cor()`
+
+```{r data_display4}
+cor(penguins_noNA_num)
+```
+
+
+
+- afficher la densité ou l'histogramme de chaque variable   $\rightarrow$ on peut faire les quatre histogrammes l'un après l'autre : 
+
+
+```{r data_display5, cache=TRUE, fig.height=3}
+hist(penguins_noNA_num$bill_length_mm)
+hist(penguins_noNA_num$bill_depth_mm)
+hist(penguins_noNA_num$flipper_length_mm)
+hist(penguins_noNA_num$body_mass_g)
+```
+
+
+Commenter ces graphiques : quelle structure remarquez-vous ?  $\rightarrow$ on remarque des groupes d'individus qu'on se doute correspondre à l'espèce des manchots (dans les nuages de points et dans les distributions parfois bimodales), deux variables sont particulièrement corrélées : la masse et la longueur des nageoires.
+
+Voici une version synthétique de ce que vous devriez obtenir :
+
+```{r correlogramm, echo=F, cache=T, fig.height=4, fig.width=5}
+penguins <-  na.omit(penguins)
+library(GGally)
+ggpairs(penguins[3:6], title="Correlogram of penguins numeric variables",
+         lower = list(continuous =wrap("points",  color="darkcyan",   size=0.3), combo = "facethist", discrete = "facetbar", na ="na"),  
+        diag = list(continuous = wrap("densityDiag", size=0.5,color="darkcyan"), discrete = "barDiag", na = "naDiag")
+        ) +theme_light()
+```
+
+
+
+### Question 3 : Préparation des données
+
+Créer un dataframe nommé `dataACP` contenant uniquement les variables numériques qui dérivent la morphologie des pingouins  $\rightarrow$ on a déja constitué cet objet : c'est `penguins_noNA_num`, on peut simplement affecter ce dataframe à un nouvel objet nommé `dataACP`.
+
+
+```{r ACP0, echo=F, cache=T, fig.height=4, fig.width=5}
+dataACP <-  penguins_noNA_num
+```
+
+
+
+
+
+## Analyse en composantes principales
+
+
+### Question 4 : calculer l'inertie de `dataACP` *sans les normaliser*    
+
+
+
+$\rightarrow$  l'inertie est la somme des variances . La variance d'une série de valeurs s'obtient avec la fonction `var()`, on peut donc écrire 
+
+
+```{r inertie}
+var(dataACP$bill_length_mm) + var(dataACP$bill_depth_mm)+ var(dataACP$flipper_length_mm) + var(dataACP$body_mass_g)
+```
+ ou plus rapidement, pour toutes les colonnes du dataframe : 
+
+```{r inertie}
+sum(var(dataACP))
+```
+
+
+### Question 4 bis : Pourquoi calculer l'inertie de variables normalisées est inutile (et trivial) ?
+
+On sait que lorsqu'on centre et réduit une variable , sa variance vaut 1. On aura donc autant de d'inertie que le nombre de variables(ici 4)
+
+
+
+
+### Question 5 : Réaliser une ACP sur  `dataACP` et stocker le résultat dans une variable (e.g. `result_ACP`) 
+
+
+$\rightarrow$  la documentation indique que par défaut les paramètres `center` et `scale` qui commandent le centrage et la reduction des variables sont mis à  `TRUE` par défaut. Ici on sélectionne 4 axes .
+
+
+```{r ACP1}
+resultACP <-  dudi.pca(dataACP, scannf = FALSE, nf=4)
+resultACP
+```
+
+Les résultats de l'ACP sont stockés dans l'objet (astucieusement nommé)  `resultatACP`
+
+
+
+### Question 5 bis : quel est le pourcentage d'inertie capturée  par les deux premières composantes ? Comment l'obtenir sans lire le scree-plot ?
+
+
+l'objet `resultatACP` contient plusieurs attributs, dont un nommé `eig` (pour eigenvalues , qui signifie valeurs propres).
+
+```{r ACP2}
+resultACP$eig 
+```
+
+L'inertie est égale à la somme des valeurs propres, on peut donc calculer la proportion d'inertie capturée par chaque composante en divisant ces valeurs par l'inertie totale 
+
+
+
+```{r ACP3}
+resultACP$eig  / sum(resultACP$eig)
+```
+
+On peut formater plus agréablement ces résultats en limitant les décimales affichées et en multipliant par 100 et en ajoutant un signe de pourcentage. (fonction `paste0`): 
+
+
+
+```{r ACP4}
+paste0(format(resultACP$eig  / sum(resultACP$eig) * 100, digits = 2), "%")
+```
+
+
+### Question 5 ter : quelle est la coordonnée de la deuxième composante dans l'espace de départ ?
+
+
+&nbsp; &nbsp;
+&nbsp; &nbsp;
+&nbsp; &nbsp;
+
+
+
+### Question 6 : D'après-vous, faut-il normaliser les variables de `dataACP` lors de l'ACP ? Pourquoi ?  
+
+Pour s'en assurer,  recommencer le calcul de l'ACP et comparer les résultats .
+
+----
+  
+  ## Interprétation des résultats
+  
+  
+  ### Question 7 : l'ACP s'est-elle bien passée ? Justifier .
+  
+  
+  Vous devriez obtenir à la question 5 un graphique à l'allure suivante : 
+
+
+```{r ACP99, echo=F, cache=T, fig.height=2, fig.width=4}
+penguins <-  na.omit(penguins)
+dataACP <- penguins %>%  select(bill_length_mm, bill_depth_mm,flipper_length_mm,body_mass_g  )
+res.pca <-  dudi.pca(dataACP, nf=4, scannf = F, center=T, scale=T)
+fviz_eig(res.pca, ylab="%age d'inertie")
+```
+
+
+
+
+
+
+
+### Question 8 : Que dire des variables projetées dans le plan formé par les deux premières composantes ?
+
+
+```{r ACP2, echo=F, cache=T, fig.height=4, fig.width=4}
+fviz_pca_var(res.pca)
+```
+
+
+### Question 9 :  Quelle est la contribution des variables `bill_length`  et `bill_depth` à la 3ème composante ? 
+
+ &nbsp; &nbsp;
+
+### Question 10 : projeter les individus dans le plan formé par les deux premières composantes . Interpréter. 
+
+```{r ACP3, echo=F, eval=F,cache=T, fig.height=5}
+fviz_pca_ind(res.pca,axes = c(1, 2) )
+```
+
+*Indice* : cf. la liste des fonctions de `factoextra`
+
+
+## Regrouppements
+
+Nous cherchons maintenant à trouver une projection qui permette de séparer visuellement les trois espèces de pengouins. 
+
+
+Voici comment obtenir des nuages de points des variables des pingouins ,colorés par espèce : 
+
+
+```{r ACP4, echo=T, cache=T, fig.height=4}
+ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, colour = species)) +
+  geom_point() +
+  theme_light()
+
+```
+
+
+Voici une version pour tous les couples de variables : 
+
+```{r ACP5, echo=T, cache=T, fig.height=4}
+ggpairs(data= penguins[,c("species" ,"bill_length_mm","bill_depth_mm", "flipper_length_mm", "body_mass_g" )], 
+        columns = c("bill_length_mm","bill_depth_mm", "flipper_length_mm", "body_mass_g" ),
+        #lower = list(continuous ="points", size=0.1),
+        lower= list(continuous =wrap("points",  size=0.3), combo = "facethist", discrete = "facetbar", na ="na"),
+         #upper= list(continuous =wrap("points",  size=0.3), combo = "facethist", discrete = "facetbar", na ="na"),
+        title="Scatterplot of penguins numeric variables by species",
+        
+        diag=NULL,
+        upper=NULL,
+        mapping = aes(color=species)
+        ) +theme_light()
+```
+
+
+
+
+### Question 11 : Les graphiques ci-dessus permettent-ils d'opérer cette classification visuelle ? 
+
+
