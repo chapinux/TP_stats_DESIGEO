@@ -1,7 +1,7 @@
 ---
 title: "TP Bivariée "
 author: "PC"
-date: "3 janvier 2022"
+date: "2023-2024"
 output:
   html_document :
     theme: paper
@@ -18,8 +18,8 @@ self-contained : yes
 
 # Mise en place 
 
-- Récupérer le fichier intitulé `2020_LoL_esports_match_data.csv` sur le repertoire partagé et le charger dans un dataframe 
-- charger les librairies `dplyr` et `ggplot2`
+- Récupérer le fichier intitulé `2020_LoL_esports_match_data.csv` sur le repertoire partagé et le charger dans un dataframe (rappel : fonction `read_csv`)
+- charger les librairies `dplyr` et `ggplot2` si elles ont déjà été installées (les installer sinon)
 
 ```{r setup, echo=T}
 library(ggplot2)
