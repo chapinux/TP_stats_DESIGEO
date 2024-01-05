@@ -202,7 +202,7 @@ L'inertie est égale à la somme des valeurs propres, on peut donc calculer la p
 resultACP$eig  / sum(resultACP$eig)
 ```
 
-On peut formater plus agréablement ces résultats en limitant les décimales affichées et en multipliant par 100 et en ajoutant un signe de pourcentage. (fonction `paste0`): 
+On peut formater plus agréablement ces résultats en limitant les décimales affichées (fonction `format()` avec l'arguments `digits`), en multipliant par 100 et en ajoutant un signe de pourcentage (fonction `paste0`): 
 
 
 
@@ -211,18 +211,52 @@ paste0(format(resultACP$eig  / sum(resultACP$eig) * 100, digits = 2), "%")
 ```
 
 
+On peut également observer ce resultat à la dernière ligne de l'affichage de `summary(resultatACP)`
+
 ### Question 5 ter : quelle est la coordonnée de la deuxième composante dans l'espace de départ ?
 
-
-&nbsp; &nbsp;
-&nbsp; &nbsp;
-&nbsp; &nbsp;
+L'objet résultat contient un attibut `c1` qui contient selon la page de documentation "he column normed scores i.e. the principal axes", c'est exactement ce qu'il nous faut: les coordonnées sont rangées par colonnes, pour chacune des composantes demandées lors de l'appel de la fonction `dudi.pca` (ici 4).
 
 
+```{r ACP5}
+resultACP$c1
+```
 
 ### Question 6 : D'après-vous, faut-il normaliser les variables de `dataACP` lors de l'ACP ? Pourquoi ?  
 
-Pour s'en assurer,  recommencer le calcul de l'ACP et comparer les résultats .
+Ici nous avons des variables exprimées en millimètres et grammes, sur des plages de valeurs assez distinctes (executer la fonction `summary()` sur l'objet `penguins` pour s'en convaincre. Il est donc recommandé de normaliser les données pour s'affranchir de ces effets. 
+
+
+Pour s'en assurer,  recommencer le calcul de l'ACP et comparer les résultats . $\rightarrow$ on constate que l'inertie est entièrement prise  par la première composante. 
+
+
+```{r ACPbis}
+ACP_nonNormalisee <-  dudi.pca(dataACP, scannf = FALSE, nf=4, center = FALSE, scale = FALSE)
+summary(ACP_nonNormalisee)
+```
+
+Observons la composition de la première composante : 
+
+```{r ACPbis2}
+ACP_nonNormalisee$c1
+```
+ La première composante est quasiment constituée de la seule `boddy_mass_g` , si oin nregarde ses coordonnées (en valeur absolue évidemment).
+ Cela est du à l'amplitude de la variable, qui se traduit par une variance très élevée : 
+ 
+ 
+```{r ACPbis2}
+var(penguins$body_mass_g)
+```
+
+surtout quand on la compare à l'inertie du nuage de points : 
+
+
+```{r ACPbis3}
+sum(var(penguins_noNA_num))
+```
+
+De ce fait , l'ACP qui chercvher à capturer l'inertie au mieux propose comme première composante , un axe quasiment exclusivement constitué de la variable  `body_mass_g`
+
 
 ----
   
