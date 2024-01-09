@@ -1,27 +1,38 @@
 ---
-title: "TP3 Corrigé "
+title: "TP3 Corrigé : manipulation avancée avec dplyr "
 author: "PC"
-date: "2022-2023"
+date: "2023-2024"
 output: 
    html_document :
      theme: paper
      toc_float: 
         collapsed: true
      toc: yes
-     highlight: breezedark
+     highlight: tango
      number_sections: yes
      number_subsections: yes
 self-contained : yes
 ---
   
   
-<style type="text/css">
-  body{
-  font-size: 12pt;
-}
-</style>
+  
 
   
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(class.source = "bg.success")
+library(rmarkdown)
+library(dplyr)
+setwd("/home/paulchapron/coursDESIGEO/TP_stats_DESIGEO/TP_3/")
+```
+
+
+```{css, echo=FALSE}
+.code_guide {
+  background-color: #FF0000;
+}
+```
+
   
 
 # Échauffement : Calcul du mode
@@ -142,7 +153,7 @@ for (modalite in levels(mydata$etiquette)){
 effectifs  
 ```
 
-On obtient une liste d'effectifs par modalité, dans l'ordre des modalités, dont on pourra prendre faiclement le maximum, et trouver les index des valeurs égales à ce maximum. 
+On obtient une liste d'effectifs par modalité, dans l'ordre des modalités, dont on pourra prendre facilement le maximum, et trouver les index des valeurs égales à ce maximum. 
 
 
 ```{r withwhich5}
@@ -256,14 +267,10 @@ Nous avons maintenant tout ce qu'il faut pour calculer le mode d'un vecteurs de 
 
 
 
- 
-
-# dplyr, l'arme absolue
 
 
 
-
-## Exercice:  masse moyenne des pingouins
+# Exercice:  masse moyenne des pingouins
 
  Le jeu de données `palmerpinguins` contient des données sur les puingouins de trois îles et de trois espèces. 
  

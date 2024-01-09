@@ -1625,15 +1625,15 @@ valeurs tirées dans une loi normale, puis on enchaîne un arrondi
 <code>mean()</code>) sur un vecteur de valeurs entières.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r bg.success"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>valeurs <span class="ot">&lt;-</span>  <span class="fu">rnorm</span>(<span class="dv">50</span>,<span class="at">mean =</span> <span class="dv">20</span>, <span class="at">sd=</span><span class="dv">1</span>) <span class="co">#50 échantillons dans une loi normale</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>valeurs</span></code></pre></div>
-<pre><code>##  [1] 20.62239 20.59011 19.38225 19.73655 20.34683 19.82456 20.56617 19.18588
-##  [9] 21.78459 19.77809 19.55508 19.72550 20.02781 20.98005 18.77767 19.15580
-## [17] 19.74384 20.96214 21.16162 17.11382 19.13680 19.31342 19.06842 19.28080
-## [25] 20.26918 20.29161 19.19596 20.97621 20.39951 20.40322 19.40322 20.58611
-## [33] 19.83618 20.54573 21.09913 20.43233 20.23978 18.87292 20.70192 18.39021
-## [41] 20.20229 21.26466 20.50525 19.39937 21.13099 19.15098 18.50488 21.31662
-## [49] 19.65808 18.60576</code></pre>
+<pre><code>##  [1] 20.26130 21.22068 20.42110 18.08159 19.98497 20.70953 19.86188 18.65701
+##  [9] 18.35895 20.51100 20.00817 20.21969 18.48110 21.63257 19.48258 20.33896
+## [17] 20.55176 19.64762 21.04949 22.31448 20.29834 20.64151 20.76189 20.24639
+## [25] 20.08263 19.78201 20.65380 20.60450 21.39859 19.17832 19.72232 19.38113
+## [33] 21.11810 21.32222 18.89502 19.40371 21.34197 20.58736 18.57944 20.01965
+## [41] 19.66813 20.71841 19.45827 19.24826 19.81979 20.28913 18.95694 21.02366
+## [49] 19.23160 21.34483</code></pre>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r bg.success"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>valeurs <span class="sc">%&gt;%</span> round <span class="sc">%&gt;%</span> mean</span></code></pre></div>
-<pre><code>## [1] 19.94</code></pre>
+<pre><code>## [1] 20.08</code></pre>
 <p>NB : en l’absence d’arguments supplémentaires dans les fonctions
 chaînées, on peut s’économiser les parenthèses</p>
 <p>En écrivant classiquement le même traitement on aurait quelque chose
